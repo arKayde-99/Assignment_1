@@ -2,12 +2,18 @@ import java.util.*;
 import java.lang.*;
 
 public class CompanyHierarchy{
+    public class NoSuchEmployee extends Exception{//user-defined exception
+        NoSuchEmployee(String message){
+            super(message);
+        }
+    }
+    
     public class SearchSequence{
         String name;
         SearchSequence next;
     }
 
-    public class LevelList{
+    public static class LevelList{
         class StoreNode{
             String name;
             StoreNode next;
@@ -17,19 +23,19 @@ public class CompanyHierarchy{
             int level;
             StoreNode head;
             LevelNode next;
+            LevelNode(int x){
+                level=x;
+            }
         }
 
-        LevelList(){
-            LevelNode CEONode=new LevelNode();
-            CEONode.level=1;
-        }
+        LevelNode CEONode=new LevelNode(1);
 
         void AddWorker(String s,int x){// adds a worker in the level list
             LevelNode t=CEONode;
             while (t.level<x && t.next!=null)
                 t=t.next;
             while (t.next==null && t.level<x){
-                LevelNode p=new LevelNode();
+                LevelNode p=new LevelNode(0);
                 p.level=t.level+1;
                 t.next=p;
                 t=p;
@@ -110,23 +116,25 @@ public class CompanyHierarchy{
 
         BSTNode SearchName(String s){
             BSTNode t=root;
-            while (s.compareTo(t.name)==0){
-                if (t==leaf)
+            while (s.compareTo(t.name)!=0){
+                if (isLeaf(t))
                     break;
                 else if (s.compareTo(t.name)<0)
                     t=t.leftChild;
                 else 
                     t=t.rightChild;
             }//now t has the pointer to node that contains the name
-            if (isLeaf(t)){
-                System.out.println("No such employee exists");
+            if (isLeaf(t))
                 return null;
-            }
+
             return t;
         }
 
         SearchSequence FindWay(String s,SearchSequence head){//this method returns a linked list of names of how to reach a particular employee from root
             BSTNode t=SearchName(s);
+            if (isLeaf(t))
+                return null;
+
             SearchSequence p=new SearchSequence();
             p.name=t.name;
             p.next=head;
@@ -138,8 +146,8 @@ public class CompanyHierarchy{
         }
 
         //debugging function 1
-        public static int lengthOfSearchSeq(SearchSequence head){
-            SearchSequence p=head;
+        public int lengthOfSearchSeq(SearchSequence head){
+            SearchSequence p=head; int count=0;
             while (p!=null){
                 count++;
                 p=p.next;
@@ -148,7 +156,7 @@ public class CompanyHierarchy{
         }
 
         void DeleteNode(BSTNode t){//this method deletes the name of an employee from the Binary Search Tree for names
-            if (t==leaf){//exception 1
+            if (isLeaf(t)){//exception 1
                 System.out.println("No such Employee exists");
                 return;
             }
@@ -184,7 +192,7 @@ public class CompanyHierarchy{
 
     }
 
-    public static class HierarchyTree{
+    public static class HierarchyTree extends CompanyHierarchy{
         class ListNode{//defining a node of the list that stores the children of an employee node
             EmployeeNode child;
             ListNode next;
@@ -207,9 +215,11 @@ public class CompanyHierarchy{
                 return;
             }
         
-            void removeChild(EmployeeNode x) throws EmptyListException{//function to remove a child from the list of children
-                if (head==null)
-                    throw new EmptyListException();
+            void removeChild(EmployeeNode x){//function to remove a child from the list of children
+                if (head==null){
+                    System.out.println("No such Employee exists");
+                    return;
+                }
                 ListNode p=head,q=p;
                 while (p.child!=x && p!=null){
                     q=p;
@@ -223,17 +233,12 @@ public class CompanyHierarchy{
                     head=head.next;
                 else 
                     q.next=p.next;
-                numChildren=countChildren();
                 numChildren=numChildren-1;
                 return;
             }
         }
         
-        HierarchyTree(){
-            EmployeeNode CEO=new EmployeeNode();
-            CEO.level=1;
-            CEO.boss=CEO;
-        }
+        EmployeeNode CEO=new EmployeeNode();
         
         SearchTree btree=new SearchTree();
         //making a binary search tree of names and a level array out of the Hierarchy tree as we make the hierarchy tree
@@ -261,7 +266,7 @@ public class CompanyHierarchy{
                     l=l.next;
                 if (l==null){
                     System.out.println("Some employee in the chain of getting to S is giving BT");
-                    return;
+                    return null;
                 }
                 p=l.child;
             }//now we have the pointer p which points to the employee in the company found in k.logn time where k is the level of the employee
@@ -269,7 +274,7 @@ public class CompanyHierarchy{
         }
 
         public void AddEmployee(String employee,String boss){//this function adds an employee under the given boss in the hierarchy tree and also updates the binary tree
-            p=getToName(boss);
+            EmployeeNode p=getToName(boss);
             EmployeeNode e=new EmployeeNode();
             e.name=employee;
             e.boss=p;
@@ -324,9 +329,9 @@ public class CompanyHierarchy{
         }
 
         public void PrintEmployees(){
-            LevelNode level=llist.CEONode;
+            LevelList.LevelNode level=llist.CEONode;
             while (level!=null){
-                StoreNode worker=level.head;
+                LevelList.StoreNode worker=level.head;
                 System.out.print("Employees at level "+level.level+": ");
                 while (worker!=null){
                     System.out.print(worker.name+" ");
@@ -339,24 +344,48 @@ public class CompanyHierarchy{
     }
 
     public static void main(String[] args){//main function for testing
-        int num_employees,count;
+        int N,count;
+        String a,b;
         Scanner s=new Scanner(System.in);
-        System.out.println("Enter the number of employees");
-        num_employees=s.nextInt();
+        System.out.println("Enter the number of initial employees");
+        N=s.nextInt();
         HierarchyTree htree=new HierarchyTree();
-        System.out.println("Enter the initial employee names along with boss names");
 
-        for (count=0;count<num_employees;count++){
-            String a=s.nextString(); String b=s.nextString();
+        System.out.println("Enter the employees along with the boss names");
+        for (count=0;count<N;count++){
+            a=s.next(); b=s.next();
             if (count==0){
                 htree.CEO.name=b;
-                htree.AddElementDS(htree.btree,htree.llist,CEO);
+                htree.CEO.level=1;
+                htree.CEO.boss=htree.CEO;
+                htree.AddElementDS(htree.btree,htree.llist,htree.CEO);
                 htree.AddEmployee(a,b);
-                count++;
             }
             else
                 htree.AddEmployee(a,b);
         }
-	htree.PrintEmployees();
-    }
+        int query_type;
+        System.out.println("Enter the number of commands");
+        N=s.nextInt();
+
+        for (count=0;count<N;count++){
+            query_type=s.nextInt();
+
+            if (query_type==0){
+                a=s.next(); b=s.next();
+                htree.AddEmployee(a,b);
+            }
+            else if (query_type==1){
+                a=s.next(); b=s.next();
+                htree.DeleteEmployee(a,b);
+            }        
+            else if (query_type==2){
+                a=s.next(); b=s.next();
+                htree.LowestCommonBoss(a,b);
+            }
+            else if (query_type==3)
+                htree.PrintEmployees();
+        }
+        return;
+    }//main function ends
 }
