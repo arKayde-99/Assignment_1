@@ -1,10 +1,10 @@
 import java.util.*;
 import java.lang.*;
 
-class CompanyHierarchy{
-    static class SearchSequence{
+public class CompanyHierarchy{
+    public class SearchSequence{
         String name;
-        Node next;
+        SearchSequence next;
     }
 
     public class LevelList{
@@ -13,14 +13,16 @@ class CompanyHierarchy{
             StoreNode next;
         }
 
-        class LevelNode{//a level node stores all employees at a given level
+        public class LevelNode{//a level node stores all employees at a given level
             int level;
             StoreNode head;
             LevelNode next;
         }
 
-        LevelNode CEONode=new LevelNode();
-        CEONode.level=1;
+        LevelList(){
+            LevelNode CEONode=new LevelNode();
+            CEONode.level=1;
+        }
 
         void AddWorker(String s,int x){// adds a worker in the level list
             LevelNode t=CEONode;
@@ -193,19 +195,19 @@ class CompanyHierarchy{
             int level;
             EmployeeNode boss;
             ListNode head;//head is the pointer to the first node of the list of children
-            int numChildren;
+            int numChildren=0;
         
             void addChild(EmployeeNode x){//adding a child to the list of children
-                ListNode l=new ListNode;
+                ListNode l=new ListNode();
                 l.child=x;
                 l.child.level=level+1;
                 l.next=head;
                 head=l;
-                numChildren=countChildren();
+                numChildren=numChildren+1;
                 return;
             }
         
-            void removeChild throws EmptyListException(EmployeeNode x){//function to remove a child from the list of children
+            void removeChild(EmployeeNode x) throws EmptyListException{//function to remove a child from the list of children
                 if (head==null)
                     throw new EmptyListException();
                 ListNode p=head,q=p;
@@ -222,20 +224,16 @@ class CompanyHierarchy{
                 else 
                     q.next=p.next;
                 numChildren=countChildren();
+                numChildren=numChildren-1;
                 return;
             }
-
-            int countChildren(){
-                ListNode p=head;
-                for (int count=0;p!=null;count++)
-                    p=p.next;
-                return count;
-            }
-            numChildren=countChildren();
         }
-        EmployeeNode CEO=new EmployeeNode();
-        CEO.level=1;
-        CEO.boss=CEO;
+        
+        HierarchyTree(){
+            EmployeeNode CEO=new EmployeeNode();
+            CEO.level=1;
+            CEO.boss=CEO;
+        }
         
         SearchTree btree=new SearchTree();
         //making a binary search tree of names and a level array out of the Hierarchy tree as we make the hierarchy tree
@@ -247,7 +245,7 @@ class CompanyHierarchy{
             arr.AddWorker(p.name,p.level);
         }
 
-        void DeleteElementDS(SearchTree LevelList arr,EmployeeNode p){
+        void DeleteElementDS(SearchTree tree,LevelList arr,EmployeeNode p){
             tree.DeleteNode(tree.SearchName(p.name));
             arr.RemoveWorker(p.name,p.level);            
         }
@@ -335,7 +333,7 @@ class CompanyHierarchy{
                     worker=worker.next;
                 }
                 System.out.print("\n");
-                level.next;
+                level=level.next;
             }
         }//print employees function ends
     }
@@ -350,14 +348,15 @@ class CompanyHierarchy{
 
         for (count=0;count<num_employees;count++){
             String a=s.nextString(); String b=s.nextString();
-            if (count=0){
-                htree.CEO.name=a;
+            if (count==0){
+                htree.CEO.name=b;
                 htree.AddElementDS(htree.btree,htree.llist,CEO);
-                htree.AddEmployee(b,a);
+                htree.AddEmployee(a,b);
                 count++;
             }
             else
                 htree.AddEmployee(a,b);
         }
+	htree.PrintEmployees();
     }
 }
