@@ -8,29 +8,65 @@ class CompanyHierarchy{
     }
 
     public class LevelList{
-        class storeNode{
+        class StoreNode{
             String name;
-            storeNode next;
+            StoreNode next;
         }
 
         class LevelNode{//a level node stores all employees at a given level
             int level;
-            storeNode head;
+            StoreNode head;
             LevelNode next;
         }
 
         LevelNode CEONode=new LevelNode();
         CEONode.level=1;
 
-        void AddWorker(String name,int x){
+        void AddWorker(String s,int x){// adds a worker in the level list
             LevelNode t=CEONode;
             while (t.level<x && t.next!=null)
                 t=t.next;
-            if (t.next==null && t.level<x){
-                LevelNode
+            while (t.next==null && t.level<x){
+                LevelNode p=new LevelNode();
+                p.level=t.level+1;
+                t.next=p;
+                t=p;
+            }//now  t contains the pointer to level node with given level
+            if (t.head==null){
+                StoreNode q=new StoreNode();
+                q.name=s;
+                t.head=q;
+                return;
             }
+
+            StoreNode q;
+            q=t.head;
+            while (q.next!=null)
+                q=q.next;
+            StoreNode r=new StoreNode();
+            r.name=s;
+            q.next=r;
+            return;
         }
 
+        void RemoveWorker(String s,int x){
+            LevelNode t=CEONode;
+            while (t.level<x)
+                t=t.next;
+            StoreNode p=t.head;
+            if (s.compareTo(p.name)==0)
+                t.head=t.head.next;
+            else {
+                StoreNode q=p;
+                p=p.next;
+                while (s.compareTo(p.name)!=0){
+                    q=p;
+                    p=p.next;
+                }//now p contains the pointer to the node storing the employee that has to be deleted
+                q.next=p.next;
+            }
+            return;
+        }
     }
 
     public class SearchTree{
@@ -203,14 +239,17 @@ class CompanyHierarchy{
         
         SearchTree btree=new SearchTree();
         //making a binary search tree of names and a level array out of the Hierarchy tree as we make the hierarchy tree
-        public void AddElementDS(SearchTree tree,LevelList[] arr,EmployeeNode p){
+        LevelList llist=new LevelList();
+        //making a 2D list of employees with a row containing all employees of same level
+
+        public void AddElementDS(SearchTree tree,LevelList arr,EmployeeNode p){
             tree.createST(p.name,p.boss.name,p.level);
-            //add element in the level list
+            arr.AddWorker(p.name,p.level);
         }
 
-        void DeleteElementDS(SearchTree LevelList[] arr,EmployeeNode p){
+        void DeleteElementDS(SearchTree LevelList arr,EmployeeNode p){
             tree.DeleteNode(tree.SearchName(p.name));
-            //delete element from level list
+            arr.RemoveWorker(p.name,p.level);            
         }
 
         EmployeeNode getToName(String name){
@@ -237,7 +276,7 @@ class CompanyHierarchy{
             e.name=employee;
             e.boss=p;
             p.addChild(e);
-            AddElementDS(btree,lArray,e);
+            AddElementDS(btree,llist,e);
         }
 
         public void DeleteEmployee(String firedEmployee,String newHead){//Deletes an employee and transfers it's children to another employee at same level
@@ -249,7 +288,7 @@ class CompanyHierarchy{
                 System.out.println("ERROR: The level of the two given employees is not equal");
                 return;
             }
-            DeleteElementDS(btree,lArray,a);//deleting this employee from search tree and level array
+            DeleteElementDS(btree,llist,a);//deleting this employee from search tree and level array
             t=a.boss;
             t.removeChild(a);//breaking connections b/w fired employee and it's boss
             a.boss=null;
@@ -287,8 +326,18 @@ class CompanyHierarchy{
         }
 
         public void PrintEmployees(){
-            /*Write the function to print names here */
-        }
+            LevelNode level=llist.CEONode;
+            while (level!=null){
+                StoreNode worker=level.head;
+                System.out.print("Employees at level "+level.level+": ");
+                while (worker!=null){
+                    System.out.print(worker.name+" ");
+                    worker=worker.next;
+                }
+                System.out.print("\n");
+                level.next;
+            }
+        }//print employees function ends
     }
 
     public static void main(String[] args){//main function for testing
@@ -303,12 +352,12 @@ class CompanyHierarchy{
             String a=s.nextString(); String b=s.nextString();
             if (count=0){
                 htree.CEO.name=a;
-                htree.updateBinaryTree(htree.btree,htree.CEO);
-                AddEmployee(b,a);
+                htree.AddElementDS(htree.btree,htree.llist,CEO);
+                htree.AddEmployee(b,a);
                 count++;
             }
             else
-                AddEmployee(a,b);
+                htree.AddEmployee(a,b);
         }
     }
 }
