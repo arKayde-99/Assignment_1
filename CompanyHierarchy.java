@@ -2,12 +2,6 @@ import java.util.*;
 import java.lang.*;
 
 public class CompanyHierarchy{
-    public class NoSuchEmployee extends Exception{//user-defined exception
-        NoSuchEmployee(String message){
-            super(message);
-        }
-    }
-    
     public class SearchSequence{
         String name;
         SearchSequence next;
@@ -170,6 +164,8 @@ public class CompanyHierarchy{
                 while (!isLeaf(q.leftChild))
                     q=q.leftChild;
                 t.name=q.name;
+		t.ib=q.ib;
+		t.level=q.level;
                 DeleteNode(q);
             }
             else {//when one child is leaf and other is not leaf
@@ -250,9 +246,15 @@ public class CompanyHierarchy{
             arr.AddWorker(p.name,p.level);
         }
 
-        void DeleteElementDS(SearchTree tree,LevelList arr,EmployeeNode p){
-            tree.DeleteNode(tree.SearchName(p.name));
-            arr.RemoveWorker(p.name,p.level);            
+        void DeleteElementDS(SearchTree tree,LevelList arr,EmployeeNode firedEmployee,EmployeeNode newHead){
+            ListNode q=firedEmployee.head;
+            while (q!=null){
+                SearchTree.BSTNode r=tree.SearchName(q.child.name);
+                r.ib=newHead.name;
+                q=q.next;
+            }
+            tree.DeleteNode(tree.SearchName(firedEmployee.name));
+            arr.RemoveWorker(firedEmployee.name,firedEmployee.level);            
         }
 
         EmployeeNode getToName(String name){
@@ -291,7 +293,7 @@ public class CompanyHierarchy{
                 System.out.println("ERROR: The level of the two given employees is not equal");
                 return;
             }
-            DeleteElementDS(btree,llist,a);//deleting this employee from search tree and level array
+            DeleteElementDS(btree,llist,a,b);//deleting this employee from search tree and level array
             t=a.boss;
             t.removeChild(a);//breaking connections b/w fired employee and it's boss
             a.boss=null;
@@ -332,7 +334,7 @@ public class CompanyHierarchy{
             LevelList.LevelNode level=llist.CEONode;
             while (level!=null){
                 LevelList.StoreNode worker=level.head;
-                System.out.print("Employees at level "+level.level+": ");
+                //System.out.print("Employees at level "+level.level+": ");
                 while (worker!=null){
                     System.out.print(worker.name+" ");
                     worker=worker.next;
@@ -347,25 +349,30 @@ public class CompanyHierarchy{
         int N,count;
         String a,b;
         Scanner s=new Scanner(System.in);
-        System.out.println("Enter the number of initial employees");
+        //System.out.println("Enter the number of initial employees");
         N=s.nextInt();
         HierarchyTree htree=new HierarchyTree();
 
-        System.out.println("Enter the employees along with the boss names");
+        //System.out.println("Enter the employees along with the boss names");
         for (count=0;count<N;count++){
             a=s.next(); b=s.next();
-            if (count==0){
-                htree.CEO.name=b;
-                htree.CEO.level=1;
-                htree.CEO.boss=htree.CEO;
-                htree.AddElementDS(htree.btree,htree.llist,htree.CEO);
-                htree.AddEmployee(a,b);
-            }
-            else
-                htree.AddEmployee(a,b);
+     	    try {
+		if (count==0){
+	                htree.CEO.name=b;
+	                htree.CEO.level=1;
+	                htree.CEO.boss=htree.CEO;
+	                htree.AddElementDS(htree.btree,htree.llist,htree.CEO);
+	                htree.AddEmployee(a,b);
+	            }
+	            else
+	                htree.AddEmployee(a,b);
+		}
+		catch (NullPointerException e){
+		System.out.println("Cannot add the element as boss does not exist");
+		}
         }
         int query_type;
-        System.out.println("Enter the number of commands");
+        //System.out.println("Enter the number of commands");
         N=s.nextInt();
 
         for (count=0;count<N;count++){
@@ -373,11 +380,21 @@ public class CompanyHierarchy{
 
             if (query_type==0){
                 a=s.next(); b=s.next();
-                htree.AddEmployee(a,b);
+		try {
+                	htree.AddEmployee(a,b);
+		}
+		catch (NullPointerException e){
+			System.out.println("Cannot add the element as boss does not exist");		
+		}
             }
             else if (query_type==1){
                 a=s.next(); b=s.next();
-                htree.DeleteEmployee(a,b);
+		try {
+                	htree.DeleteEmployee(a,b);
+		}
+		catch (NullPointerException e){
+			System.out.println("Employee does not exist");
+		}
             }        
             else if (query_type==2){
                 a=s.next(); b=s.next();
