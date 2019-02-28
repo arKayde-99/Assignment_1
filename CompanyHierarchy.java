@@ -393,12 +393,17 @@ public class CompanyHierarchy{
                 	htree.DeleteEmployee(a,b);
 		}
 		catch (NullPointerException e){
-			System.out.println("Employee does not exist");
+			System.out.println("One of the Employee does not exist");
 		}
             }        
             else if (query_type==2){
-                a=s.next(); b=s.next();
-                htree.LowestCommonBoss(a,b);
+		try{
+                	a=s.next(); b=s.next();
+                	htree.LowestCommonBoss(a,b);
+		}
+		catch (NullPointerException e){
+			System.out.println("One of the Employee does not exist");
+		}
             }
             else if (query_type==3)
                 htree.PrintEmployees();
