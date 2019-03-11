@@ -2,7 +2,7 @@ import java.util.*;
 import java.lang.*;
 import java.io.*;
 
-public class BestFit(){
+public class BestFit{
 
     public class MyList{
         class Box{
@@ -136,7 +136,7 @@ public class BestFit(){
             Node t2=x.leftChild; Node t3=x.rightChild;
             y.leftChild=t3; t3.parent=y;
             z.rightChild=t2; t2.parent=z;
-            x.leftChild=z; x=rightChild=y;
+            x.leftChild=z; x.rightChild=y;
             x.parent=z.parent;
             z.parent=x; y.parent=x;
             if (x.parent==null)
@@ -150,7 +150,7 @@ public class BestFit(){
 
         void reStructure(Node z){//function to restructure the AVL Tree by rotations
             while (z!=null){
-                heightDiff=z.leftChild.height=z.rightChild.height;
+                int heightDiff=z.leftChild.height=z.rightChild.height;
                 if (heightDiff<-2 || heightDiff>2){
                     Node x,y;
                     if (z.rightChild.height>z.leftChild.height)
@@ -207,7 +207,7 @@ public class BestFit(){
         }//add node function ends
         
         public void Delete_Node(Node t){//function to delete a node in this tree
-            if (t.leftChild.isEmpty() && t.rightChild,isEmpty()){//when both children are leaf
+            if (t.leftChild.isEmpty() && t.rightChild.isEmpty()){//when both children are leaf
                 if (t.parent.leftChild==t)
                     t.parent.leftChild=new Node();
                 else
@@ -221,7 +221,6 @@ public class BestFit(){
                     q=q.leftChild;
                 t.ID=q.ID;
                 t.capacity=q.capacity;
-                t.location=q.location;
                 t.objectlist=q.objectlist;
                 Delete_Node(q);
             }
@@ -236,7 +235,7 @@ public class BestFit(){
                     t.parent.leftChild=internalChild;
                 else
                     t.parent.rightChild=internalChild;
-                restructure(t);
+                reStructure(t);
                 return;
             }            
         }//delete function ends
@@ -255,11 +254,11 @@ public class BestFit(){
     public class IDTree{
         public class Piece{// a piece will correspond to one piece
             Integer ID;
-            Node theBin;
+            BinTree.Node theBin;
             int height;
-            Node leftChild;
-            Node rightChild;
-            Node parent;
+            Piece leftChild;
+            Piece rightChild;
+            Piece parent;
 
             Piece(){
                 height=0;
@@ -270,7 +269,7 @@ public class BestFit(){
             }
         }
 
-        public void fillPiece(Piece t,int x,Node y){
+        public void fillPiece(Piece t,int x,BinTree.Node y){
             t.ID=x;
             t.theBin=y;
             t.leftChild=new Piece();
@@ -346,7 +345,7 @@ public class BestFit(){
             Piece t2=x.leftChild; Piece t3=x.rightChild;
             y.leftChild=t3; t3.parent=y;
             z.rightChild=t2; t2.parent=z;
-            x.leftChild=z; x=rightChild=y;
+            x.leftChild=z; x.rightChild=y;
             x.parent=z.parent;
             z.parent=x; y.parent=x;
             if (x.parent==null)
@@ -360,7 +359,7 @@ public class BestFit(){
 
         void reStructure(Piece z){//function to restructure the AVL Tree by rotations
             while (z!=null){
-                heightDiff=z.leftChild.height=z.rightChild.height;
+                int heightDiff=z.leftChild.height=z.rightChild.height;
                 if (heightDiff<-2 || heightDiff>2){
                     Piece x,y;
                     if (z.rightChild.height>z.leftChild.height)
@@ -405,7 +404,7 @@ public class BestFit(){
             }
         }
 
-        public void Add_Piece(int bin_id,Node bin_loc){
+        public void Add_Piece(int bin_id,BinTree.Node bin_loc){
             Piece z=SearchPiece(bin_id);
             if (z.isEmpty()){
                 fillPiece(z,bin_id,bin_loc);
@@ -417,7 +416,7 @@ public class BestFit(){
         }//add node function ends
         
         public void Delete_Piece(Piece t){//function to delete a node in this tree
-            if (t.leftChild.isEmpty() && t.rightChild,isEmpty()){//when both children are leaf
+            if (t.leftChild.isEmpty() && t.rightChild.isEmpty()){//when both children are leaf
                 if (t.parent.leftChild==t)
                     t.parent.leftChild=new Piece();
                 else
@@ -444,7 +443,7 @@ public class BestFit(){
                     t.parent.leftChild=internalChild;
                 else
                     t.parent.rightChild=internalChild;
-                restructure(t);
+                reStructure(t);
                 return;
             }            
         }//delete function ends
@@ -453,8 +452,8 @@ public class BestFit(){
     public class ObjectTree{// this is an AVL Tree of objects
         public class Link{
             Integer obj_id;
-            Node storing_bin;
-            Box location;
+            BinTree.Node storing_bin;
+            MyList.Box location;
             Link leftChild;
             Link rightChild;
             Link parent;
@@ -465,18 +464,18 @@ public class BestFit(){
             }
 
             Boolean isEmpty(){
-                return (obj_id==null)
+                return (obj_id==null);
             }
         }
 
         Link ORoot=new Link();
 
-        public void fillLink(Link t,int ID,Node bin,Box loc){
+        public void fillLink(Link t,int ID,BinTree.Node bin,MyList.Box loc){
             t.obj_id=ID;
             t.storing_bin=bin;
             t.location=loc;
-            t.leftChild=new Node();
-            t.rightChild=new Node();
+            t.leftChild=new Link();
+            t.rightChild=new Link();
             t.leftChild.parent=t;
             t.rightChild.parent=t;
 
@@ -546,11 +545,11 @@ public class BestFit(){
             Link t2=x.leftChild; Link t3=x.rightChild;
             y.leftChild=t3; t3.parent=y;
             z.rightChild=t2; t2.parent=z;
-            x.leftChild=z; x=rightChild=y;
+            x.leftChild=z; x.rightChild=y;
             x.parent=z.parent;
             z.parent=x; y.parent=x;
             if (x.parent==null)
-                root=x;
+                ORoot=x;
             else if (x.parent.leftChild==z)
                 x.parent.leftChild=x;
             else
@@ -558,9 +557,9 @@ public class BestFit(){
             return;         
         }
 
-        void reStructure(Link z){
+        public void reStructure(Link z){
             while (z!=null){
-                heightDiff=z.leftChild.height=z.rightChild.height;
+                int heightDiff=z.leftChild.height=z.rightChild.height;
                 if (heightDiff<-2 || heightDiff>2){
                     Link x,y;
                     if (z.rightChild.height>z.leftChild.height)
@@ -605,7 +604,7 @@ public class BestFit(){
             }
         }
 
-        public void Add_Link(int ID, Node bin, Box loc){
+        public void Add_Link(int ID, BinTree.Node bin, MyList.Box loc){
             Link z=SearchLink(ID);
             if (z.isEmpty()){
                 fillLink(z,ID,bin,loc);
@@ -622,7 +621,7 @@ public class BestFit(){
                 return;
             }
 
-            if (t.leftChild.isEmpty() && t.rightChild,isEmpty()){//when both children are leaf
+            if (t.leftChild.isEmpty() && t.rightChild.isEmpty()){//when both children are leaf
                 if (t.parent.leftChild==t)
                     t.parent.leftChild=new Link();
                 else
@@ -659,98 +658,102 @@ public class BestFit(){
     BinTree PineTree=new BinTree();
     ObjectTree AppleTree=new ObjectTree();
     IDTree CoconutTree=new IDTree();
-
-    public void add_bin(int bin_id,int capacity){
-        PineTree.Add_Node(bin_id,capacity);
-        BinTree.Node bin=PineTree.SearchNode(capacity); 
-        CoconutTree.Add_Piece(bin_id,bin);
-    }
-
-    public Integer add_object(int obj_id,int size){
-        BinTree.Node max_cap=PineTree.getMax();
-        if (size>max_cap.capacity){
-            System.out.println("Cannot add object as it is too big");
-            return null;
-        }
-        max_cap.capacity=max_cap.capacity-size;//decreasing the capacity of bin
-        BinTree.Node.Box location=max_cap.objectlist.Add_Box(obj_id,size);
-
-        AppleTree.Add_Link(obj_id,max_cap,location);//adding the object in Object Tree
-
-        PineTree.Add_Node(max_cap.ID,max_cap.capacity);//making a new node in AVL Tree with updated capacity
-        BinTree.Node p=PineTree.SearchNode(max_cap.capacity);
-        p.objectlist=max_cap.objectlist;
-
-        IDTree.Piece r=CoconutTree.SearchPiece(max_cap.ID);//updating the bin pointer in ID Tree
-        r.bin_loc=p;
-
-        PineTree.Delete_Node(max_cap);//Deleting the old node in Bin tree
-        return p.ID;
-    }
     
-    public Integer delete_object(int obj_id){
-        ObjectTree.Link obj_search=AppleTree.SearchLink(obj_id);
-        BinTree.Node.Box point=obj_search.location;
-        BinTree.Node bin=obj_search.storing_bin;
-        int result=bin.ID;
-        bin.capacity=bin.capacity+point.object_size;//update the capacity of the bin
+    public static class Functions extends BestFit{
 
-        AppleTree.Delete_Link(obj_search);//delete the object from the object tree
+        public void add_bin(int bin_id,int capacity){
+            PineTree.Add_Node(bin_id,capacity);
+            BinTree.Node bin=PineTree.SearchNode(capacity); 
+            CoconutTree.Add_Piece(bin_id,bin);
+        }
 
-        bin.objectlist.Delete_Box(point);//delete the object from the object list of the bin
+        public Integer add_object(int obj_id,int size){
+            BinTree.Node max_cap=PineTree.getMax();
+            if (size>max_cap.capacity){
+                System.out.println("Cannot add object as it is too big");
+                return null;
+            }
+            max_cap.capacity=max_cap.capacity-size;//decreasing the capacity of bin
+            MyList.Box location=max_cap.objectlist.Add_Box(obj_id,size);
 
-        PineTree.Add_Node(bin.ID,bin.capacity);//shift the bin in the bin tree
-        Bin.Node p=PineTree.SearchNode(bin.capacity);
-        p.objectlist=bin.objectlist;
+            AppleTree.Add_Link(obj_id,max_cap,location);//adding the object in Object Tree
 
-        IDTree.Piece r=CoconutTree.SearchPiece(bin.ID);//updating the bin pointer in ID Tree
-        r.bin_loc=p;
+            PineTree.Add_Node(max_cap.ID,max_cap.capacity);//making a new node in AVL Tree with updated capacity
+            BinTree.Node p=PineTree.SearchNode(max_cap.capacity);
+            p.objectlist=max_cap.objectlist;
 
-        PineTree.Delete_Node(bin);//deleting the old node in Bin Tree
-        return result;
-    }
+            IDTree.Piece r=CoconutTree.SearchPiece(max_cap.ID);//updating the bin pointer in ID Tree
+            r.theBin=p;
 
-    public void List_contents(int bin_id){
-        IDTree.Piece p=CoconutTree.SearchPiece(bin_id);
-        BinTree.Node q=PineTree.SearchNode(p.bin_loc);
-        System.out.println("Bin ID: "+q.ID+" ");
-        BinTree.Node.MyList.Box r=q.objectlist.HEADER;
-        r=r.next;
-        while (r!=q.objectlist.TRAILER)
-            System.out.println(r.object_id+" "+r.object_size);
+            PineTree.Delete_Node(max_cap);//Deleting the old node in Bin tree
+            return p.ID;
+        }
+    
+        public Integer delete_object(int obj_id){
+            ObjectTree.Link obj_search=AppleTree.SearchLink(obj_id);
+            MyList.Box point=obj_search.location;
+            BinTree.Node bin=obj_search.storing_bin;
+            int result=bin.ID;
+            bin.capacity=bin.capacity+point.object_size;//update the capacity of the bin
+
+            AppleTree.Delete_Link(obj_search);//delete the object from the object tree
+
+            bin.objectlist.Delete_Box(point);//delete the object from the object list of the bin
+
+            PineTree.Add_Node(bin.ID,bin.capacity);//shift the bin in the bin tree
+            BinTree.Node p=PineTree.SearchNode(bin.capacity);
+            p.objectlist=bin.objectlist;
+
+            IDTree.Piece r=CoconutTree.SearchPiece(bin.ID);//updating the bin pointer in ID Tree
+            r.theBin=p;
+
+            PineTree.Delete_Node(bin);//deleting the old node in Bin Tree
+            return result;
+        }
+
+        public void List_contents(int bin_id){
+            IDTree.Piece p=CoconutTree.SearchPiece(bin_id);
+            BinTree.Node q=p.theBin;
+            System.out.println("Bin ID: "+q.ID+" ");
+            MyList.Box r=q.objectlist.HEADER;
+            r=r.next;
+            while (r!=q.objectlist.TRAILER)
+              System.out.println(r.object_id+" "+r.object_size);
+        }
     }
 
     public static void main(String[] args){
         try{
             FileInputStream fstream=new FileInputStream("file.txt");
             Scanner s=new Scanner(fstream);
+            Functions func=new Functions();
             while (s.hasNextLine()){
                 int check=s.nextInt();
 
                 if (check==1){
                     int parameter1=s.nextInt(); int parameter2=s.nextInt();
-                    add_bin(parameter1,parameter2);
+                    func.add_bin(parameter1,parameter2);
                 }
 
                 else if (check==2){
                     int parameter1=s.nextInt(); int parameter2=s.nextInt();
-                    int result=add_object(parameter1,parameter2);
+                    int result=func.add_object(parameter1,parameter2);
                     System.out.println(result);
                 }
 
                 else if (check==3){
                     int parameter1=s.nextInt();
-                    int result=delete_object(parameter1);
+                    int result=func.delete_object(parameter1);
                     System.out.println(result);
                 }
 
                 else if (check==4){
                     int parameter1=s.nextInt();
-                    List_contents(parameter1);
+                    func.List_contents(parameter1);
                 }
 
                 else {
-                    System.out.prinln("Invalid option no.")
+                    System.out.println("Invalid option no.")
                 }
             }
         }
