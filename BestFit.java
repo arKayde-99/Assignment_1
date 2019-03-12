@@ -11,9 +11,14 @@ public class BestFit{
             Box next;
             Box prev;
         }
-        int length=0;
-        Box HEADER=new Box();
-        Box TRAILER=new Box();
+        int length;
+	Box HEADER=new Box();
+	Box TRAILER=new Box();
+	MyList(){
+		length=0;
+		HEADER.next=TRAILER;
+		TRAILER.prev=HEADER;
+	}
 
         public Box Add_Box(int identity, int size){
             Box p=new Box();
@@ -777,6 +782,7 @@ public class BestFit{
                    		func.List_contents(parameter1);
 			}
 			catch (NullPointerException e){	
+				System.out.println("No such bin exists in the data");
 			}
                 }
 
