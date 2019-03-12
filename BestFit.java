@@ -757,14 +757,14 @@ public class BestFit{
             MyList.Box point=obj_search.location;
             BinTree.Node bin=obj_search.storing_bin;
             int result=bin.ID;
-            bin.capacity=bin.capacity+point.object_size;//update the capacity of the bin
+            int size_increase=point.object_size;
 
             AppleTree.Delete_Link(obj_search);//delete the object from the object tree
 
             bin.objectlist.Delete_Box(point);//delete the object from the object list of the bin
 
-            PineTree.Add_Node(bin.ID,bin.capacity);//shift the bin in the bin tree
-            BinTree.Node p=PineTree.SearchNode(bin.capacity);
+            PineTree.Add_Node(bin.ID,bin.capacity+size_increase);//shift the bin in the bin tree
+            BinTree.Node p=PineTree.SearchNode(bin.capacity+size_increase);
             p.objectlist=bin.objectlist;
 
             IDTree.Piece r=CoconutTree.SearchPiece(bin.ID);//updating the bin pointer in ID Tree
