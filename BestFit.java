@@ -551,6 +551,8 @@ public class BestFit{
         public Link SearchLink(int key){
             Link t=ORoot;
 
+	if (t.obj_id==null)
+	return t;
             while (t.obj_id!=key && !t.isEmpty()){
                 if (t.obj_id<key)
                     t=t.rightChild;
