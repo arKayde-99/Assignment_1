@@ -215,7 +215,9 @@ public class BestFit{
             else {
                 //get the inOrder successor of this node and add another similar node before it
             }
-            reStructure(z);
+	try {
+            reStructure(z);}
+	catch (NullPointerException e){}
         }//add node function ends
         
         public void Delete_Node(Node t){//function to delete a node in this tree
@@ -229,7 +231,9 @@ public class BestFit{
                 else
                     t.parent.rightChild=new Node();
                 t.parent=null;
-                reStructure(t);
+		try {
+                reStructure(t);}
+		catch (NullPointerException e){}
             }
             else if (!t.leftChild.isEmpty() && !t.rightChild.isEmpty()){//when it is an internal node
                 Node q=t.rightChild;
@@ -271,7 +275,9 @@ public class BestFit{
                         t.leftChild.parent=t.parent;
                     }
                 }
-                reStructure(t.parent);
+		try {
+                reStructure(t.parent);}
+		catch (NullPointerException e){}
                 return;
             }            
         }//delete function ends
@@ -451,7 +457,10 @@ public class BestFit{
             else {
                 //get the inOrder successor of this node and add another similar node before it
             }
+	try{
             reStructure(z);
+	}
+	catch (NullPointerException e){}
         }//add node function ends
         
         public void Delete_Piece(Piece t){//function to delete a node in this tree
@@ -465,7 +474,9 @@ public class BestFit{
                 else
                     t.parent.rightChild=new Piece();
                 t.parent=null;
-                reStructure(t);
+		try {
+                reStructure(t);}
+		catch (NullPointerException e){}
             }
             else if (!t.leftChild.isEmpty() && !t.rightChild.isEmpty()){//when it is an internal node
                 Piece q=t.rightChild;
@@ -493,7 +504,9 @@ public class BestFit{
                 else
                     t.parent.rightChild=internalChild;
                 internalChild.parent=t.parent;
-                reStructure(internalChild);
+		try {
+                reStructure(internalChild);}
+		catch (NullPointerException e){}
                 return;
             }            
         }//delete function ends
@@ -668,7 +681,10 @@ public class BestFit{
             else {
                 //get the inOrder successor of this node and add another similar node before it
             }
-            reStructure(z);
+            try {
+		reStructure(z);
+	}
+	catch (NullPointerException e){}
         }
 
         public void Delete_Link(Link t){//function to delete a link in this tree
@@ -685,7 +701,10 @@ public class BestFit{
                 else
                     t.parent.rightChild=new Link();
                 t.parent=null;
+		try {
                 reStructure(t);
+		}
+		catch (NullPointerException e){}
             }
             else if (!t.leftChild.isEmpty() && !t.rightChild.isEmpty()){//when it is an internal node
                 Link q=t.rightChild;
@@ -715,8 +734,11 @@ public class BestFit{
                 else
                     t.parent.rightChild=internalChild;
                 internalChild.parent=t.parent;
-
+		
+		try {
                 reStructure(internalChild);
+		}
+		catch (NullPointerException e){}
             }
         }//delete function ends
     }
@@ -789,11 +811,10 @@ public class BestFit{
         public void List_contents(int bin_id){
             IDTree.Piece p=CoconutTree.SearchPiece(bin_id);
             BinTree.Node q=p.theBin;
-            System.out.println("Bin ID: "+q.ID+" ");
             MyList.Box r=q.objectlist.HEADER.next;
     
             while (r!=q.objectlist.TRAILER){
-              System.out.println("Object ID: "+r.object_id+"	Object size: "+r.object_size);
+              System.out.println(r.object_id+" "+r.object_size);
               r=r.next;
             }
         }
@@ -801,11 +822,11 @@ public class BestFit{
 
     public static void main(String[] args){
         
-	System.out.println("Enter the number of commands you wish to enter");    
-	Scanner s=new Scanner(System.in);
-	int num_commands=s.nextInt();
-            Functions func=new Functions();
-            for (int count=0;count<num_commands;count++){
+	try {    
+	FileInputStream fstream=new FileInputStream("file.txt");
+	Scanner s=new Scanner(fstream);
+            Functions func=new Functions(); try {
+            while (s.hasNextLine()){
                 int check=s.nextInt();
 
                 if (check==1){
@@ -817,7 +838,7 @@ public class BestFit{
                     int parameter1=s.nextInt(); int parameter2=s.nextInt();
                     try{
                     int result=func.add_object(parameter1,parameter2);
-                    System.out.println("Bin in which object was added: "+result);
+                    System.out.println(result);
                     }
                     catch (NullPointerException e){
                         
@@ -827,7 +848,7 @@ public class BestFit{
                 else if (check==3){
                     int parameter1=s.nextInt();
                     int result=func.delete_object(parameter1);
-                    System.out.println("Bin from which object was removed: "+result);
+                    System.out.println(result);
                 }
 
                 else if (check==4){
@@ -843,7 +864,11 @@ public class BestFit{
                 else {
                     System.out.println("Invalid option no.");
                 }
-            }
+            }} catch (NoSuchElementException e){}
+	}
+	catch (FileNotFoundException e){
+		System.out.println("File Not Found");
+	}
         return;
     }
 }
