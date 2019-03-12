@@ -220,7 +220,7 @@ public class BestFit{
         
         public void Delete_Node(Node t){//function to delete a node in this tree
             if (t.leftChild.isEmpty() && t.rightChild.isEmpty()){//when both children are leaf
-                if (t==root){
+                if (t==root || t.parent==null){
                     root=new Node();
                     return;
                 }
@@ -241,24 +241,37 @@ public class BestFit{
                 Delete_Node(q);
             }
             else {//when one child is leaf and other is not leaf
-                Node internalChild;
-                if (t.leftChild.isEmpty())
-                    internalChild=t.rightChild;
-                else
-                    internalChild=t.leftChild;
-                    
-                if (t==root){
-                    root=internalChild;
-                    root.parent=null;
-                    return;
+                if (t.leftChild==null){
+                    if (t==root){
+                        root=root.rightChild;
+                        root.parent=null;
+                        return;
+                    }
+                    if (t.parent.leftChild==t){
+                        t.parent.leftChild=t.rightChild;
+                        t.rightChild.parent=t.parent;
+                    }
+                    else {
+                        t.parent.rightChild=t.rightChild;
+                        t.rightChild.parent=t.parent;
+                    }
                 }
-                
-                else if (t.parent.leftChild==t)
-                    t.parent.leftChild=internalChild;
-                else
-                    t.parent.rightChild=internalChild;
-                internalChild.parent=t.parent;
-                reStructure(internalChild);
+                else {
+                    if (t==root || t.parent==null){
+                        root=root.leftChild;
+                        root.parent=null;
+                        return;
+                    }
+                    if (t.parent.leftChild==t){
+                        t.parent.leftChild=t.leftChild;
+                        t.leftChild.parent=t.parent;
+                    }
+                    if (t.parent.rightChild==t){
+                        t.parent.rightChild=t.leftChild;
+                        t.leftChild.parent=t.parent;
+                    }
+                }
+                reStructure(t.parent);
                 return;
             }            
         }//delete function ends
@@ -739,8 +752,9 @@ public class BestFit{
                 AppleTree.fillLink(AppleTree.ORoot,obj_id,max_cap,location);
             else
                 AppleTree.Add_Link(obj_id,max_cap,location);//adding the object in Object Tree
+                
 
-            
+            PineTree.Delete_Node(max_cap);//Deleting the old node in Bin tree
             PineTree.Add_Node(max_cap.ID,max_cap.capacity-size);//making a new node in AVL Tree with updated capacity
             BinTree.Node p=PineTree.SearchNode(max_cap.capacity-size);
             p.objectlist=max_cap.objectlist;
@@ -748,7 +762,6 @@ public class BestFit{
             IDTree.Piece r=CoconutTree.SearchPiece(max_cap.ID);//updating the bin pointer in ID Tree
             r.theBin=p;
 
-            PineTree.Delete_Node(max_cap);//Deleting the old node in Bin tree
             return p.ID;
         }
     
@@ -763,14 +776,13 @@ public class BestFit{
 
             bin.objectlist.Delete_Box(point);//delete the object from the object list of the bin
 
+            PineTree.Delete_Node(bin);//deleting the old node in Bin Tree
             PineTree.Add_Node(bin.ID,bin.capacity+size_increase);//shift the bin in the bin tree
             BinTree.Node p=PineTree.SearchNode(bin.capacity+size_increase);
             p.objectlist=bin.objectlist;
 
             IDTree.Piece r=CoconutTree.SearchPiece(bin.ID);//updating the bin pointer in ID Tree
             r.theBin=p;
-
-            PineTree.Delete_Node(bin);//deleting the old node in Bin Tree
             return result;
         }
 
