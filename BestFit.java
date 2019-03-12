@@ -53,10 +53,11 @@ public class BestFit{
 
             Node(){
                 height=0;
+		capacity=null;
             }
 
             Boolean isEmpty(){
-                return (capacity==null);
+                return capacity==null;
             }
         }
 
@@ -196,7 +197,13 @@ public class BestFit{
         }
 
         public void Add_Node(int bin_id,int capacity){
-            Node z=SearchNode(capacity);
+	Node z=root;	            
+		while (!z.isEmpty() && z.capacity!=capacity){
+			if (z.capacity<capacity)
+				z=z.rightChild;
+			else
+				z=z.leftChild;
+		}
             if (z.isEmpty()){
                 fillNode(z,bin_id,capacity);
             }
@@ -405,7 +412,13 @@ public class BestFit{
         }
 
         public void Add_Piece(int bin_id,BinTree.Node bin_loc){
-            Piece z=SearchPiece(bin_id);
+            Piece z=Iroot;
+	while (!z.isEmpty() && z.ID!=bin_id){
+		if (z.ID<bin_id)
+			z=z.rightChild;
+		else
+			z=z.leftChild;
+	}
             if (z.isEmpty()){
                 fillPiece(z,bin_id,bin_loc);
             }
@@ -662,8 +675,15 @@ public class BestFit{
     public static class Functions extends BestFit{
 
         public void add_bin(int bin_id,int capacity){
-            PineTree.Add_Node(bin_id,capacity);
-            BinTree.Node bin=PineTree.SearchNode(capacity); 
+	if (PineTree.root.capacity==null)
+		PineTree.fillNode(PineTree.root,bin_id,capacity);
+		
+	else
+            	PineTree.Add_Node(bin_id,capacity);
+            BinTree.Node bin=PineTree.SearchNode(capacity);
+	if (CoconutTree.Iroot.ID==null)
+		CoconutTree.fillPiece(CoconutTree.Iroot,bin_id,bin);
+	else 
             CoconutTree.Add_Piece(bin_id,bin);
         }
 
@@ -717,17 +737,21 @@ public class BestFit{
             System.out.println("Bin ID: "+q.ID+" ");
             MyList.Box r=q.objectlist.HEADER;
             r=r.next;
-            while (r!=q.objectlist.TRAILER)
-              System.out.println(r.object_id+" "+r.object_size);
+            while (r!=q.objectlist.TRAILER){
+              System.out.println("Object ID: "+r.object_id+"	Object size: "+r.object_size);
+		if (r.next==q.objectlist.TRAILER)
+			break;
+		}
         }
     }
 
     public static void main(String[] args){
-        try{
-            FileInputStream fstream=new FileInputStream("file.txt");
-            Scanner s=new Scanner(fstream);
+        
+	System.out.println("Enter the number of commands you wish to enter");    
+	Scanner s=new Scanner(System.in);
+	int num_commands=s.nextInt();
             Functions func=new Functions();
-            while (s.hasNextLine()){
+            for (int count=0;count<num_commands;count++){
                 int check=s.nextInt();
 
                 if (check==1){
@@ -738,29 +762,28 @@ public class BestFit{
                 else if (check==2){
                     int parameter1=s.nextInt(); int parameter2=s.nextInt();
                     int result=func.add_object(parameter1,parameter2);
-                    System.out.println(result);
+                    System.out.println("Bin in which object was added: "+result);
                 }
 
                 else if (check==3){
                     int parameter1=s.nextInt();
                     int result=func.delete_object(parameter1);
-                    System.out.println(result);
+                    System.out.println("Bin from which object was removed: "+result);
                 }
 
                 else if (check==4){
-                    int parameter1=s.nextInt();
-                    func.List_contents(parameter1);
+			try{
+                   		int parameter1=s.nextInt();
+                   		func.List_contents(parameter1);
+			}
+			catch (NullPointerException e){	
+			}
                 }
 
                 else {
-                    System.out.println("Invalid option no.")
+                    System.out.println("Invalid option no.");
                 }
             }
-        }
-
-        catch (FileNotFoundException e){
-            System.out.println("File not found");
-        }
         return;
     }
 }
