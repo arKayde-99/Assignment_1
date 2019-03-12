@@ -50,7 +50,7 @@ public class BestFit{
         public class Node{// a node will correspond to one bin
             Integer ID;
             Integer capacity;
-            MyList objectlist;
+            MyList objectlist=new MyList();
             int height;
             Node leftChild;
             Node rightChild;
@@ -220,7 +220,11 @@ public class BestFit{
         
         public void Delete_Node(Node t){//function to delete a node in this tree
             if (t.leftChild.isEmpty() && t.rightChild.isEmpty()){//when both children are leaf
-                if (t.parent.leftChild==t)
+                if (t==root){
+                    root=new Node();
+                    return;
+                }
+                else if (t.parent.leftChild==t)
                     t.parent.leftChild=new Node();
                 else
                     t.parent.rightChild=new Node();
@@ -241,25 +245,29 @@ public class BestFit{
                 if (t.leftChild.isEmpty())
                     internalChild=t.rightChild;
                 else
-                    internalChild=t.rightChild;
+                    internalChild=t.leftChild;
+                    
+                if (t==root){
+                    root=internalChild;
+                    root.parent=null;
+                    return;
+                }
                 
-                if (t.parent.leftChild==t)
+                else if (t.parent.leftChild==t)
                     t.parent.leftChild=internalChild;
                 else
                     t.parent.rightChild=internalChild;
-                reStructure(t);
+                internalChild.parent=t.parent;
+                reStructure(internalChild);
                 return;
             }            
         }//delete function ends
 
         public Node getMax(){
             Node t=root;
-            while (!t.isEmpty())
+            while (!t.rightChild.isEmpty())
                 t=t.rightChild;
-            if (t!=root)
-                return t.parent;
-            else 
-                return root;
+            return t;
         }
     }
 
@@ -435,7 +443,11 @@ public class BestFit{
         
         public void Delete_Piece(Piece t){//function to delete a node in this tree
             if (t.leftChild.isEmpty() && t.rightChild.isEmpty()){//when both children are leaf
-                if (t.parent.leftChild==t)
+                if (t==Iroot){
+                    Iroot=new Piece();
+                    return;
+                }
+                else if (t.parent.leftChild==t)
                     t.parent.leftChild=new Piece();
                 else
                     t.parent.rightChild=new Piece();
@@ -455,13 +467,20 @@ public class BestFit{
                 if (t.leftChild.isEmpty())
                     internalChild=t.rightChild;
                 else
-                    internalChild=t.rightChild;
+                    internalChild=t.leftChild;
+                    
+                if (t==Iroot){
+                    Iroot=internalChild;
+                    Iroot.parent=null;
+                    return;
+                }
                 
-                if (t.parent.leftChild==t)
+                else if (t.parent.leftChild==t)
                     t.parent.leftChild=internalChild;
                 else
                     t.parent.rightChild=internalChild;
-                reStructure(t);
+                internalChild.parent=t.parent;
+                reStructure(internalChild);
                 return;
             }            
         }//delete function ends
@@ -623,7 +642,13 @@ public class BestFit{
         }
 
         public void Add_Link(int ID, BinTree.Node bin, MyList.Box loc){
-            Link z=SearchLink(ID);
+            Link z=ORoot;
+            while (!z.isEmpty() && z.obj_id!=ID){
+                if (z.obj_id<ID)
+                    z=z.rightChild;
+                else
+                    z=z.leftChild;
+            }
             if (z.isEmpty()){
                 fillLink(z,ID,bin,loc);
             }
@@ -640,7 +665,9 @@ public class BestFit{
             }
 
             if (t.leftChild.isEmpty() && t.rightChild.isEmpty()){//when both children are leaf
-                if (t.parent.leftChild==t)
+                if (t==ORoot)
+                    ORoot=new Link();
+                else if (t.parent.leftChild==t)
                     t.parent.leftChild=new Link();
                 else
                     t.parent.rightChild=new Link();
@@ -661,14 +688,22 @@ public class BestFit{
                 if (t.leftChild.isEmpty())
                     internalChild=t.rightChild;
                 else
-                    internalChild=t.rightChild;
+                    internalChild=t.leftChild;
+                    
+                if (t==ORoot){
+                    ORoot=internalChild;
+                    ORoot.parent=null;
+                    return;
+                }
                 
-                if (t.parent.leftChild==t)
+                else if (t.parent.leftChild==t)
                     t.parent.leftChild=internalChild;
                 
                 else
                     t.parent.rightChild=internalChild;
-                reStructure(t);
+                internalChild.parent=t.parent;
+
+                reStructure(internalChild);
             }
         }//delete function ends
     }
@@ -698,13 +733,16 @@ public class BestFit{
                 System.out.println("Cannot add object as it is too big");
                 return null;
             }
-            max_cap.capacity=max_cap.capacity-size;//decreasing the capacity of bin
             MyList.Box location=max_cap.objectlist.Add_Box(obj_id,size);
 
-            AppleTree.Add_Link(obj_id,max_cap,location);//adding the object in Object Tree
+            if (AppleTree.ORoot.obj_id==null)
+                AppleTree.fillLink(AppleTree.ORoot,obj_id,max_cap,location);
+            else
+                AppleTree.Add_Link(obj_id,max_cap,location);//adding the object in Object Tree
 
-            PineTree.Add_Node(max_cap.ID,max_cap.capacity);//making a new node in AVL Tree with updated capacity
-            BinTree.Node p=PineTree.SearchNode(max_cap.capacity);
+            
+            PineTree.Add_Node(max_cap.ID,max_cap.capacity-size);//making a new node in AVL Tree with updated capacity
+            BinTree.Node p=PineTree.SearchNode(max_cap.capacity-size);
             p.objectlist=max_cap.objectlist;
 
             IDTree.Piece r=CoconutTree.SearchPiece(max_cap.ID);//updating the bin pointer in ID Tree
@@ -740,13 +778,12 @@ public class BestFit{
             IDTree.Piece p=CoconutTree.SearchPiece(bin_id);
             BinTree.Node q=p.theBin;
             System.out.println("Bin ID: "+q.ID+" ");
-            MyList.Box r=q.objectlist.HEADER;
-            r=r.next;
+            MyList.Box r=q.objectlist.HEADER.next;
+    
             while (r!=q.objectlist.TRAILER){
               System.out.println("Object ID: "+r.object_id+"	Object size: "+r.object_size);
-		if (r.next==q.objectlist.TRAILER)
-			break;
-		}
+              r=r.next;
+            }
         }
     }
 
@@ -766,8 +803,13 @@ public class BestFit{
 
                 else if (check==2){
                     int parameter1=s.nextInt(); int parameter2=s.nextInt();
+                    try{
                     int result=func.add_object(parameter1,parameter2);
                     System.out.println("Bin in which object was added: "+result);
+                    }
+                    catch (NullPointerException e){
+                        
+                    }
                 }
 
                 else if (check==3){
