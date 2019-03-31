@@ -157,9 +157,13 @@ public class Compress{
     }
     public static void main(String[] args){
         try {
-            FileInputStream fstream=new FileInputStream("file1.txt");
+            FileInputStream fstream=new FileInputStream(args[0]);
             Scanner s=new Scanner(fstream);
             HashDictionary Oxford=new HashDictionary();
+
+            PrintStream o=new PrintStream(new File(args[1]));
+            PrintStream console=System.out;//for writing output to a file
+            System.setOut(o);
 
             while (s.hasNextLine()){
                 String line=s.nextLine();

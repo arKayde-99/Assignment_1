@@ -166,9 +166,13 @@ public class Decompress{
 
     public static void main(String[] args){
         try {
-            FileInputStream fstream=new FileInputStream("file2.txt");
+            FileInputStream fstream=new FileInputStream(args[0]);
             Scanner s=new Scanner(fstream);
             HashDictionary Oxford=new HashDictionary();
+
+            PrintStream o=new PrintStream(new File(args[1]));
+            PrintStream console=System.out;//for writing output to a file
+            System.setOut(o);
 
             int recent,old; String accumulate,b;
             old=getNum(s.next()); accumulate=Oxford.getName(old); b=Character.toString(accumulate.charAt(0));
