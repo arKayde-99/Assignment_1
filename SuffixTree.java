@@ -107,7 +107,7 @@ public class SuffixTree{
                     }
                 }
 
-                if (i!=(s.length()-1)){//splitting of the node has to be done
+                if (i!=s.length()){//splitting of the node has to be done
                     String commonPart=conCat(s,0,i-1);
                     String unCommon=conCat(s,i,s.length()-1);
                     test.word=commonPart;
