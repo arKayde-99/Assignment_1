@@ -30,7 +30,7 @@ public class SuffixTree{
 
         Node root=new Node();
 
-        Boolean isWordPresent(String mystery){//checks if a word is present in the trie
+        public Boolean isWordPresent(String mystery){//checks if a word is present in the trie
             Node t=root;
             for (int count=0;count<mystery.length();){
                 char c=mystery.charAt(count);
@@ -40,9 +40,10 @@ public class SuffixTree{
                 Node test=t.ChildArray[getIndex(c)];
                 String s=test.word;
 
-                for (int i=0;mystery.charAt(count)==s.charAt(i);count++,i++){
+                int i;
+                for (i=0;mystery.charAt(count)==s.charAt(i);count++,i++){
                     if (count==(mystery.length()-1))
-                        return test.isWordEnd();
+                        return (test.isWordEnd && (i==(s.length()-1)));
                     
                     if (i==(s.length()-1))
                         break;
@@ -53,11 +54,12 @@ public class SuffixTree{
                 count++;
                 t=test;
             }
+            return false;
         }
 
         public void AddWord(String treasure){
             if (isWordPresent(treasure)){
-                System.out.println("This String already exists in the trie");
+                //System.out.println("This String already exists in the trie");
                 return;
             }
 
@@ -74,8 +76,9 @@ public class SuffixTree{
 
                 Node test=t.ChildArray[getIndex(c)];
                 String s=test.word;
-            
-                for (int i=0;treasure.charAt(count)==s.charAt(i);count++,i++){
+                int i;
+
+                for (i=0;treasure.charAt(count)==s.charAt(i);count++,i++){
                     if (count==(treasure.length()-1)){//CASE 2: Word is a prefix of an already existing word
                         if (i==(s.length()-1))
                             test.isWordEnd=true;
@@ -91,7 +94,7 @@ public class SuffixTree{
                             }
                             newPart.parent=test;
                             test.ChildArray=new Node[26];
-                            Char d=unCommon.charAt(0);
+                            char d=unCommon.charAt(0);
                             test.ChildArray[getIndex(d)]=newPart;
                         }
                         return;
@@ -117,7 +120,7 @@ public class SuffixTree{
                     }
                     newPart.parent=test;
                     test.ChildArray=new Node[26];
-                    Char d=unCommon.charAt(0);
+                    char d=unCommon.charAt(0);
                     test.ChildArray[getIndex(d)]=newPart;
                     t=test;
                 }                       
@@ -137,7 +140,7 @@ public class SuffixTree{
             String word=s.next();
             for (int i=0;i<word.length();i++){
                 String temp="";
-                for (j=i;j<word.length();j++)
+                for (int j=i;j<word.length();j++)
                     temp=temp+Character.toString(word.charAt(j));
                 OakTrie.AddWord(temp);
             }
@@ -147,11 +150,11 @@ public class SuffixTree{
         N=s.nextInt();
 
         for (int count=0;count<N;count++){
-            String search=s.next;
+            String search=s.next();
             if (OakTrie.isWordPresent(search))
                 System.out.println("This word is present in the trie");
             else
-                System.out.pritnln("This word is NOT present in the trie");
+                System.out.println("This word is NOT present in the trie");
         }
         return;      
     }
