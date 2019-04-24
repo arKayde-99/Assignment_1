@@ -74,10 +74,6 @@ public class SuffixTree{
                 int i;
                 for (i=0;mystery.charAt(count)==s.charAt(i);count++,i++){
                     if (count==(mystery.length()-1)){
-                        /*if (test.isWordEnd && (i==(s.length()-1)))
-                            System.out.println(mystery+" is present");
-                        else
-                            System.out.println(mystery+" is NOT present");*/
                         return (test.isWordEnd && (i==(s.length()-1)));
                     }
                     
@@ -86,7 +82,6 @@ public class SuffixTree{
                         break;
                 }
                 if (i!=s.length()){
-                    //System.out.println(mystery+" is NOT present");
                     return false;
                 }
 
@@ -94,7 +89,6 @@ public class SuffixTree{
                 t=test;
             }
             
-            //System.out.println(mystery+" is NOT present");
             return false;
         }
 
@@ -155,6 +149,7 @@ public class SuffixTree{
                 
                     if (i==(s.length()-1)){//CASE 3: The Word's prefix is already present =>> node does not have to split
                         count++; i++;
+                        test.locList.Add(p);
                         t=test;
                         break;
                     }
@@ -181,12 +176,12 @@ public class SuffixTree{
             }
         }
 
-        public void findPattern(String mystery){
+        public MyList.ListNode findPattern(String mystery){//returns a list containing all starting positions of the pattern
             Node t=root;
             for (int count=0;count<mystery.length();){
                 char c=mystery.charAt(count);
                 if (t.ChildArray[getIndex(c)]==null){
-                    return;
+                    return null;
                 }
 
                 Node test=t.ChildArray[getIndex(c)];
@@ -196,13 +191,7 @@ public class SuffixTree{
                 for (i=0;mystery.charAt(count)==s.charAt(i);count++,i++){
                     if (count==(mystery.length()-1)){
                         MyList.ListNode q=test.locList.head;
-                        while (q!=null){
-                            int ini=q.value; int fin=ini+mystery.length()-1;
-                            System.out.print(ini+" "+fin+"    ");
-                            q=q.next;
-                        }
-                        System.out.print("\n");
-                        return;
+                        return q;
                     }
                     
                     if (i==(s.length()-1)){
@@ -211,13 +200,74 @@ public class SuffixTree{
                     }
                 }
                 if (i!=s.length())
-                    return;
+                    return null;
                 count++;
                 t=test;
+            }
+            return null;
+        }
+
+        public void printList(String mystery){//prints the contents of the list
+            MyList.ListNode q=findPattern(mystery);
+            while (q!=null){
+                int ini=q.value; int fin=ini+mystery.length()-1;
+                System.out.print(ini+" "+fin+"    ");
+                q=q.next;
+            }
+            System.out.print("\n");
+        }
+
+        public void SimpleCases(String mystery,int place){
+            if (place==0){
+                String search=conCat(mystery,1,mystery.length()-1);
+                printList(search);
+            }
+            else {
+                String search=conCat(mystery,0,mystery.length()-2);
+                printList(search);
             }
             return;
         }
 
+        public void WildcardStar(String mystery,String text){
+            String forward,backward; int count;
+            for (count=0;count<mystery.length() && mystery.charAt(count)!='*';count++);
+
+            if (count==0 || count==mystery.length()-1){
+                SimpleCases(mystery,count);
+                return;
+            }
+            forward=conCat(mystery,0,count-1);
+            backward=conCat(mystery,count+1,mystery.length()-1);
+
+            MyList.ListNode i=findPattern(forward);
+            MyList.ListNode j=findPattern(backward);
+
+            while (i!=null){
+                MyList.ListNode t=j;
+                while (t!=null){
+                    int a,b,c,d;
+                    a=i.value; b=a+forward.length()-1;
+                    c=t.value; d=c+backward.length()-1;
+
+                    if (c-b>1){
+                        String result=conCat(text,a,d);
+                        System.out.println(result);
+                    }
+                    t=t.next;    
+                }
+                i=i.next;
+            }
+            return;
+        }
+
+        public void WildcardQuestion(String mystery,int[] arr){
+
+        }
+
+        public void Joker(String mystery){
+
+        }
         //Suffix Trie Class ends
     }
 
@@ -239,11 +289,35 @@ public class SuffixTree{
                 }
             }
 
-            int N=s.nextInt();//number of search operations to be implemented
+            int y,N=s.nextInt();//number of search operations to be implemented
 
             for (int count=0;count<N;count++){
                 String search=s.next();
-                OakTrie.findPattern(search);
+
+                Boolean hasStar=false,hasQuestionMark=false;
+                for (y=0;y<search.length();y++)//checking for presence of star in search string
+                    if (search.charAt(y)=='*'){
+                        hasStar=true; break; 
+                    }
+                
+                int [] sArray=new int[search.length()]; 
+                for (y=0;y<search.length();y++){
+                    if (search.charAt(y)=='?'){
+                        hasQuestionMark=true;
+                        sArray[y]=1;
+                    }
+                }//checking if the search string has Question marks
+                if (hasQuestionMark & !hasStar)
+                    OakTrie.WildcardQuestion(search,sArray);
+
+                else if (hasStar & !hasQuestionMark)
+                    OakTrie.WildcardStar(search,line);
+
+                else if (hasStar && hasQuestionMark)
+                    OakTrie.Joker(search);
+                
+                else
+                    OakTrie.printList(search);
             }
         }
         catch (FileNotFoundException e){
